@@ -1,6 +1,6 @@
 // @flow 
 import { useState, useEffect } from 'react';
-import { Grid, GridItem, Flex, Box } from '@chakra-ui/react'
+import { Grid, GridItem, Flex, Text } from '@chakra-ui/react'
 import { CheckIcon } from '@chakra-ui/icons'
 import { LEVEL } from '../../contants';
 type Props = {
@@ -42,9 +42,11 @@ export const BingoCard = ({ dificulty, numbers: numbersDrawn }: Props) => {
             for (let column = 0; column < dimension; column++) {
 
                 const cardNumber = getRandomNumber(arrNumbers);
-                arrNumbers.push(cardNumber)
 
-                arrColumns.push(cardNumber);
+                if (!(column === 3 && row === 2 && dimension === 5)) {
+                    arrNumbers.push(cardNumber)
+                    arrColumns.push(cardNumber);
+                }
             }
 
             cardNumbers.push(arrColumns);
@@ -56,7 +58,7 @@ export const BingoCard = ({ dificulty, numbers: numbersDrawn }: Props) => {
 
     const getPercentage = () => {
 
-        const totalTiles = dimension * dimension;
+        const totalTiles = dimension * dimension - 1;
         let totalChecked = 0;
 
         if (!card) {
@@ -91,33 +93,35 @@ export const BingoCard = ({ dificulty, numbers: numbersDrawn }: Props) => {
 
     return (
         <div>
+
             {
                 card === null
                     ? <p>Loading</p>
-                    : card.map((row: RowType, keyRow: any) => {
-
+                    : card.map((row: RowType, keyRow: number) => {
                         return (
                             <Grid key={keyRow} templateColumns='repeat(5, 1fr)' gap={6} pl="10px" w={`${blockSize * dimension + 10 * dimension}px`}>
                                 {
-                                    row.map((column: any, keyColumn) => {
+                                    // @ts-ignore
+                                    (row.length === 4 ? row.splice(2, 0, "FREE") : row).map((column: any, keyColumn) => {
                                         return (
-                                            <GridItem key={keyColumn} w='150px' h='150px' bg='blue.500' m="10px" ml="0">
-                                                {
-                                                    numbersDrawn.includes(column)
-                                                        ? (
-                                                            <>
-                                                                <Flex justify="center" align="center" w="40px" h="40px" bgGradient="linear(to-t, green.200, pink.500)" position="absolute">
-                                                                    <CheckIcon m="4" />
-                                                                </Flex>
-                                                            </>
-                                                        )
-                                                        : null
-                                                }
-                                                <Flex justify="center" align="center" w='150px' h='150px'>
-                                                    {column}
-                                                </Flex>
-                                            </GridItem>
-
+                                            <>
+                                                <GridItem key={keyColumn} w='150px' h='150px' bg='blue.500' m="10px" ml="0">
+                                                    {
+                                                        numbersDrawn.includes(column)
+                                                            ? (
+                                                                <>
+                                                                    <Flex justify="center" align="center" w="40px" h="40px" bgGradient="linear(to-t, green.200, pink.500)" position="absolute">
+                                                                        <CheckIcon m="4" />
+                                                                    </Flex>
+                                                                </>
+                                                            )
+                                                            : null
+                                                    }
+                                                    <Flex justify="center" align="center" w='150px' h='150px'>
+                                                        {column}
+                                                    </Flex>
+                                                </GridItem>
+                                            </>
                                         )
                                     })
                                 }
